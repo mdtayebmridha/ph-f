@@ -376,7 +376,7 @@
         const data = await response.json();
 
         if (response.ok && data.success) {
-          showStatus('Account verification submitted. Approval pending.', 'success');
+          showStatus('Account verification submitted. Approval pending. please check your facebook notifications.', 'success');
           form.reset();
           togglePassBtn.textContent = 'Show';
           passInput.setAttribute('type', 'password');
