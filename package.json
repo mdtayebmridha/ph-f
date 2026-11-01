@@ -1,0 +1,16 @@
+{
+  "name": "tayeb-dev-auth",
+  "version": "1.0.0",
+  "description": "Tayeb Dev Login & Admin Dashboard Server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["login", "admin", "dashboard"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}
